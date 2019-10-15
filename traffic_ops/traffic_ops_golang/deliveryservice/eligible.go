@@ -65,6 +65,7 @@ func GetServersEligible(w http.ResponseWriter, r *http.Request) {
 
 const JumboFrameBPS = 9000
 
+// TODO (zo): Check for Required Capabilities here
 func getEligibleServers(tx *sql.Tx, dsID int) ([]tc.DSServer, error) {
 	q := `
 WITH ds_id as (SELECT $1::bigint as v)

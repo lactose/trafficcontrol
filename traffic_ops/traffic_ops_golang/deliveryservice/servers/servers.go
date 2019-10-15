@@ -367,6 +367,7 @@ func createServersRef() *TODeliveryServiceServers {
 }
 
 // GetCreateHandler assigns an existing Server to and existing Deliveryservice in response to api/1.1/deliveryservices/{xml_id}/servers
+// TODO (zo): (check that the servers being assigned to the delivery service have the needed capabilities)
 func GetCreateHandler(w http.ResponseWriter, r *http.Request) {
 	inf, userErr, sysErr, errCode := api.NewInfo(r, []string{"xml_id"}, nil)
 	if userErr != nil || sysErr != nil {
