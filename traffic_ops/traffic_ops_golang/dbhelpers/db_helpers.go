@@ -251,7 +251,7 @@ func GetDSTenantIDFromXMLID(tx *sql.Tx, xmlid string) (int, bool, error) {
 }
 
 // GetFederationResolversByFederationID fetches all of the federation resolvers currently assigned to a federation.
-func GetFederationResolversByFederationID(tx *sql.Tx, id int) ([]tc.FederationResolver, bool, error) {
+func GetFederationResolversByFederationID(tx *sql.Tx, fedID int) ([]tc.FederationResolver, bool, error) {
 	qry := `
 		SELECT
 		  fr.ip_address
@@ -270,7 +270,7 @@ func GetFederationResolversByFederationID(tx *sql.Tx, id int) ([]tc.FederationRe
 	}
 	defer rows.Close()
 
-	resolvers := []tc.FederationResolver
+	resolvers := []tc.FederationResolver{}
 	for rows.Next() {
 		fr := tc.FederationResolver{}
 		err := rows.Scan(
@@ -286,6 +286,17 @@ func GetFederationResolversByFederationID(tx *sql.Tx, id int) ([]tc.FederationRe
 	return resolvers, true, nil
 }
 
+// GetFederationNameFromID returns the federation's name, whether a federation with ID exists, or any error.
+func GetFederationNameFromID(id int, tx *sql.Tx) (string, bool, error) {
+	var name string
+	if err := tx.QueryRow(`SELECT cname from federation where id = $1`, id).Scan(&name); err != nil {
+		if err == sql.ErrNoRows {
+			return name, false, nil
+		}
+		return name, false, errors.New("querying federation name from id: " + err.Error())
+	}
+	return name, true, nil
+}
 
 // GetProfileNameFromID returns the profile's name, whether a profile with ID exists, or any error.
 func GetProfileNameFromID(id int, tx *sql.Tx) (string, bool, error) {
