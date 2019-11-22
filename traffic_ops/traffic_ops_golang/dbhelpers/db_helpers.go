@@ -254,9 +254,9 @@ func GetDSTenantIDFromXMLID(tx *sql.Tx, xmlid string) (int, bool, error) {
 func GetFederationResolversByFederationID(tx *sql.Tx, fedID int) ([]tc.FederationResolver, bool, error) {
 	qry := `
 		SELECT
-		  fr.ip_address
+		  fr.ip_address,
 		  frt.name as resolver_type,
-		  ffr.federation_resolver,
+		  ffr.federation_resolver
 		FROM
 		  federation_federation_resolver ffr
 		  JOIN federation_resolver fr ON ffr.federation_resolver = fr.id
@@ -286,13 +286,10 @@ func GetFederationResolversByFederationID(tx *sql.Tx, fedID int) ([]tc.Federatio
 	return resolvers, true, nil
 }
 
-// GetFederationNameFromID returns the federation's name, whether a federation with ID exists, or any error.
+// GetFederationNameFromID returns the federation's name.
 func GetFederationNameFromID(id int, tx *sql.Tx) (string, bool, error) {
 	var name string
 	if err := tx.QueryRow(`SELECT cname from federation where id = $1`, id).Scan(&name); err != nil {
-		if err == sql.ErrNoRows {
-			return name, false, nil
-		}
 		return name, false, errors.New("querying federation name from id: " + err.Error())
 	}
 	return name, true, nil
